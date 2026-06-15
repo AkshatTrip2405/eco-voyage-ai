@@ -6,8 +6,8 @@ export default function Hero() {
       </h1>
 
       <p className="text-lg text-gray-700">
-        Plan eco-friendly trips with AI-powered recommendations.
+        Plan sustainable and eco-friendly trips with AI-powered recommendations.
       </p>
     </section>
   );
-}
+}   
