@@ -1,7 +1,7 @@
 export default function Hero() {
   return (
-    <section className="text-center py-20 bg-green-100">
-      <h1 className="text-5xl font-bold mb-4">
+    <section className="bg-green-100 py-24 text-center">
+      <h1 className="text-5xl font-bold text-gray-900 mb-4">
         Discover Sustainable Travel
       </h1>
 
@@ -10,4 +10,4 @@ export default function Hero() {
       </p>
     </section>
   );
-}   
+}
