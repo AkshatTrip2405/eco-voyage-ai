@@ -1,164 +1,175 @@
-# EcoVoyage AI 🌱✈️
+# Eco Voyage AI 🌱✈️
 
-## Multi-Agent Intelligent Eco-Travel Recommendation & Planning System
+Eco Voyage AI is an AI-powered eco-travel recommendation platform designed to help users discover sustainable travel destinations, compare eco-scores, and make environmentally conscious travel decisions.
 
-### Intern Details
+## Intern Information
 
-- **Name:** Akshat Tripathi
-- **Intern ID:** 26100440
-- **Program:** TBI-GEHU Summer Internship Program 2026
-- **Domain:** AI-Assisted Full Stack Web Development
+- Name: Akshat Tripathi
+- Intern ID: 26100440
+- Internship: AI Full Stack Web Development Internship
+- Organization: TBI-GEU
 
 ---
 
 ## Project Overview
 
-EcoVoyage AI is a responsive web application designed to help travelers discover sustainable and eco-friendly travel options. The platform provides intelligent recommendations for destinations, accommodations, and travel plans while promoting environmentally conscious tourism.
+The platform focuses on promoting sustainable tourism by providing eco-friendly travel recommendations and destination insights.
 
-This project demonstrates:
+Key features include:
 
-- Responsive web design using Next.js and Tailwind CSS
-- Component-based architecture
-- Reusable UI components
-- Multi-page navigation
-- Mobile-friendly layouts
+- Eco-friendly destination recommendations
+- Sustainability score visualization
+- Travel dashboard
+- Responsive user interface
+- Dark/Light mode support
+- Reusable UI component library
 
 ---
 
-## Features Implemented
+## Week 3 Deliverables
 
-### Week 2 Deliverables
+### 1. Component Library
 
-✅ Responsive Navigation Bar
+Implemented reusable UI components inside:
 
-✅ Reusable Hero Section Component
+```text
+components/ui/
+```
 
-✅ Reusable Card Component
+Components developed:
 
-✅ Reusable Footer Component
+- Button
+- Input
+- Modal
+- Toast
+- Loader
+- ThemeToggle
 
-✅ Home Page
+An index file is also included for centralized exports.
 
-✅ About Page
+### 2. Component Showcase
 
-✅ Dashboard Page
+A dedicated component showcase page demonstrates all reusable components.
 
-✅ Login Page
+Route:
 
-✅ Mobile Responsive Design
+```text
+/components-demo
+```
+
+Features demonstrated:
+
+- Button variants
+- Input fields
+- Modal popup
+- Toast notifications
+- Loader animation
+- Theme switching
+
+### 3. Responsive Dashboard
+
+Created a responsive dashboard supporting:
+
+| Device | Width |
+|----------|----------|
+| Mobile | 375px |
+| Tablet | 768px |
+| Desktop | 1440px |
+
+Dashboard includes:
+
+- Eco Score card
+- Recommended Trips card
+- Carbon Saved card
+- Recommended Destinations section
+- Recent Trips section
+
+### 4. Dark / Light Mode
+
+Implemented a theme switching feature using the reusable ThemeToggle component.
+
+Features:
+
+- Dark Mode
+- Light Mode
+- Persistent theme preference
+- Smooth transitions
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Tools
+
+- Figma
+- GitHub
+- VS Code
 
 ---
 
 ## Project Structure
 
 ```text
-eco-voyage-ai/
+src/
 │
 ├── app/
-│   ├── page.tsx
-│   ├── about/
 │   ├── dashboard/
-│   └── login/
+│   └── components-demo/
 │
 ├── components/
-│   ├── Navbar.tsx
-│   ├── Hero.tsx
-│   ├── Card.tsx
-│   └── Footer.tsx
+│   ├── DashboardCard.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       ├── Input.tsx
+│       ├── Modal.tsx
+│       ├── Toast.tsx
+│       ├── Loader.tsx
+│       ├── ThemeToggle.tsx
+│       └── index.ts
 │
-├── public/
-│
-└── README.md
+└── styles/
 ```
-
----
-
-## Technologies Used
-
-- Next.js 16
-- React
-- TypeScript
-- Tailwind CSS
-- Git & GitHub
 
 ---
 
 ## Screenshots
 
-### Home Page (Desktop)
+The project includes:
 
-Responsive landing page featuring:
-- Hero section
-- AI Travel Planner card
-- Green Stays card
-- Navigation bar
-- Footer
-
-### Home Page (Mobile)
-
-Mobile-friendly layout with:
-- Stacked content
-- Responsive cards
-- Optimized navigation
-
-### Dashboard Page
-
-Dashboard placeholder for:
-- Travel recommendations
-- Travel plans
-- Booking management
-
----
-
-## GitHub Repository
-
-Repository Link:
-
-https://github.com/AkshatTrip2405/eco-voyage-ai
-
----
-
-## Running the Project
-
-Clone the repository:
-
-```bash
-git clone https://github.com/AkshatTrip2405/eco-voyage-ai.git
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Run development server:
-
-```bash
-npm run dev
-```
-
-Open:
-
-```text
-http://localhost:3000
-```
+- Desktop Dashboard View
+- Tablet Dashboard View
+- Mobile Dashboard View
+- Dark Mode Demo
+- Light Mode Demo
 
 ---
 
 ## Future Enhancements
 
-- AI-powered itinerary generation
-- Sustainable hotel recommendations
+- AI-based personalized travel recommendations
 - Carbon footprint estimation
 - User authentication
-- Travel analytics dashboard
-- Booking integration
+- Destination comparison engine
+- Travel itinerary generation
+
+---
+
+## Repository
+
+GitHub Repository:
+
+https://github.com/AkshatTrip2405/eco-voyage-ai
 
 ---
 
 ## Author
 
-**Akshat Tripathi**
-
-TBI-GEHU Summer Internship Program 2026
+Akshat Tripathi  
+Intern ID: 26100440
