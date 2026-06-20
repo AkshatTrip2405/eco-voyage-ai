@@ -1,36 +1,175 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Eco Voyage AI 🌱✈️
 
-## Getting Started
+Eco Voyage AI is an AI-powered eco-travel recommendation platform designed to help users discover sustainable travel destinations, compare eco-scores, and make environmentally conscious travel decisions.
 
-First, run the development server:
+## Intern Information
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Name: Akshat Tripathi
+- Intern ID: 26100440
+- Internship: AI Full Stack Web Development Internship
+- Organization: TBI-GEU
+
+---
+
+## Project Overview
+
+The platform focuses on promoting sustainable tourism by providing eco-friendly travel recommendations and destination insights.
+
+Key features include:
+
+- Eco-friendly destination recommendations
+- Sustainability score visualization
+- Travel dashboard
+- Responsive user interface
+- Dark/Light mode support
+- Reusable UI component library
+
+---
+
+## Week 3 Deliverables
+
+### 1. Component Library
+
+Implemented reusable UI components inside:
+
+```text
+components/ui/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Components developed:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Button
+- Input
+- Modal
+- Toast
+- Loader
+- ThemeToggle
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+An index file is also included for centralized exports.
 
-## Learn More
+### 2. Component Showcase
 
-To learn more about Next.js, take a look at the following resources:
+A dedicated component showcase page demonstrates all reusable components.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Route:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+/components-demo
+```
 
-## Deploy on Vercel
+Features demonstrated:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Button variants
+- Input fields
+- Modal popup
+- Toast notifications
+- Loader animation
+- Theme switching
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 3. Responsive Dashboard
+
+Created a responsive dashboard supporting:
+
+| Device | Width |
+|----------|----------|
+| Mobile | 375px |
+| Tablet | 768px |
+| Desktop | 1440px |
+
+Dashboard includes:
+
+- Eco Score card
+- Recommended Trips card
+- Carbon Saved card
+- Recommended Destinations section
+- Recent Trips section
+
+### 4. Dark / Light Mode
+
+Implemented a theme switching feature using the reusable ThemeToggle component.
+
+Features:
+
+- Dark Mode
+- Light Mode
+- Persistent theme preference
+- Smooth transitions
+
+---
+
+## Tech Stack
+
+### Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Tools
+
+- Figma
+- GitHub
+- VS Code
+
+---
+
+## Project Structure
+
+```text
+src/
+│
+├── app/
+│   ├── dashboard/
+│   └── components-demo/
+│
+├── components/
+│   ├── DashboardCard.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       ├── Input.tsx
+│       ├── Modal.tsx
+│       ├── Toast.tsx
+│       ├── Loader.tsx
+│       ├── ThemeToggle.tsx
+│       └── index.ts
+│
+└── styles/
+```
+
+---
+
+## Screenshots
+
+The project includes:
+
+- Desktop Dashboard View
+- Tablet Dashboard View
+- Mobile Dashboard View
+- Dark Mode Demo
+- Light Mode Demo
+
+---
+
+## Future Enhancements
+
+- AI-based personalized travel recommendations
+- Carbon footprint estimation
+- User authentication
+- Destination comparison engine
+- Travel itinerary generation
+
+---
+
+## Repository
+
+GitHub Repository:
+
+https://github.com/AkshatTrip2405/eco-voyage-ai
+
+---
+
+## Author
+
+Akshat Tripathi  
+Intern ID: 26100440
