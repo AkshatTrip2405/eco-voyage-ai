@@ -1,30 +1,29 @@
-import Navbar from "../components/Navbar";
-import Hero from "../components/Hero";
-import Card from "../components/Card";
-import Footer from "../components/Footer";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import Card from "@/components/Card";
 
 export default function Home() {
   return (
-    <>
+    <div className="p-10">
       <Navbar />
 
       <Hero />
 
-      <main className="max-w-6xl mx-auto p-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card
-            title="AI Travel Planner"
-            description="Generate personalized eco-tourism itineraries."
-          />
+      <input
+        type="text"
+        placeholder="Search Destination..."
+        className="border p-3 w-full mb-8"
+      />
 
-          <Card
-            title="Green Stays"
-            description="Find sustainable homestays and eco-resorts."
-          />
-        </div>
-      </main>
+      <h2 className="text-xl font-bold mb-4">
+        Recommended Trips
+      </h2>
 
-      <Footer />
-    </>
+      <div className="grid grid-cols-3 gap-4">
+        <Card title="Goa Eco Score" />
+        <Card title="Manali Eco Score" />
+        <Card title="Kerala Eco Score" />
+      </div>
+    </div>
   );
 }

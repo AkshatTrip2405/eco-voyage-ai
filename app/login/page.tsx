@@ -1,17 +1,9 @@
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+import LoginForm from "@/components/LoginForm";
 
-export default function Login() {
+export default function LoginPage() {
   return (
-    <>
-      <Navbar />
-
-      <main className="p-10">
-        <h1 className="text-4xl font-bold mb-4">Login</h1>
-        <p>User authentication page placeholder.</p>
-      </main>
-
-      <Footer />
-    </>
+    <div className="flex justify-center items-center min-h-screen">
+      <LoginForm />
+    </div>
   );
 }

@@ -1,13 +1,9 @@
 export default function Hero() {
   return (
-    <section className="bg-green-100 py-24 text-center">
-      <h1 className="text-5xl font-bold text-gray-900 mb-4">
+    <div className="bg-gray-200 h-64 flex items-center justify-center mb-8">
+      <h2 className="text-3xl font-bold">
         Discover Sustainable Travel
-      </h1>
-
-      <p className="text-lg text-gray-700">
-        Plan sustainable and eco-friendly trips with AI-powered recommendations.
-      </p>
-    </section>
+      </h2>
+    </div>
   );
 }
