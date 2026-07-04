@@ -1,0 +1,253 @@
+{
+"info": {
+"name": "Eco Voyage API",
+"description": "Postman Collection for Eco Voyage AI Backend (Week 4)",
+"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+},
+"item": [
+{
+"name": "1. Get All Destinations",
+"request": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations"]
+}
+},
+"response": [
+{
+"name": "Success Example",
+"originalRequest": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations"]
+}
+},
+"status": "OK",
+"code": 200,
+"_postman_previewlanguage": "json",
+"body": "[\n    {\n        "name": "Kerala Backwaters",\n        "location": "Kerala, India",\n        "eco_score": 95,\n        "description": "Sustainable houseboats and nature walks.",\n        "image_url": "kerala.jpg",\n        "id": "550e8400-e29b-41d4-a716-446655440000"\n    }\n]"
+}
+]
+},
+{
+"name": "2. Create Destination",
+"request": {
+"method": "POST",
+"header": [
+{
+"key": "Content-Type",
+"value": "application/json"
+}
+],
+"body": {
+"mode": "raw",
+"raw": "{\n  "name": "Goa Beaches",\n  "location": "Goa, India",\n  "eco_score": 85,\n  "description": "Beach cleanup and eco-resorts.",\n  "image_url": "goa.jpg"\n}"
+},
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations"]
+}
+},
+"response": [
+{
+"name": "Created Example",
+"originalRequest": {
+"method": "POST",
+"header": [
+{
+"key": "Content-Type",
+"value": "application/json"
+}
+],
+"body": {
+"mode": "raw",
+"raw": "{\n  "name": "Goa Beaches",\n  "location": "Goa, India",\n  "eco_score": 85,\n  "description": "Beach cleanup and eco-resorts.",\n  "image_url": "goa.jpg"\n}"
+},
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations"]
+}
+},
+"status": "Created",
+"code": 201,
+"_postman_previewlanguage": "json",
+"body": "{\n    "name": "Goa Beaches",\n    "location": "Goa, India",\n    "eco_score": 85,\n    "description": "Beach cleanup and eco-resorts.",\n    "image_url": "goa.jpg",\n    "id": "123e4567-e89b-12d3-a456-426614174000"\n}"
+}
+]
+},
+{
+"name": "3. Search Destinations",
+"request": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/search?q=Kerala",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "search"],
+"query": [
+{
+"key": "q",
+"value": "Kerala"
+}
+]
+}
+},
+"response": [
+{
+"name": "Search Result Example",
+"originalRequest": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/search?q=Kerala",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "search"],
+"query": [
+{
+"key": "q",
+"value": "Kerala"
+}
+]
+}
+},
+"status": "OK",
+"code": 200,
+"_postman_previewlanguage": "json",
+"body": "[\n    {\n        "name": "Kerala Backwaters",\n        "location": "Kerala, India",\n        "eco_score": 95,\n        "description": "Sustainable houseboats and nature walks.",\n        "image_url": "kerala.jpg",\n        "id": "550e8400-e29b-41d4-a716-446655440000"\n    }\n]"
+}
+]
+},
+{
+"name": "4. Get Single Destination",
+"request": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"response": [
+{
+"name": "Single Item Example",
+"originalRequest": {
+"method": "GET",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"status": "OK",
+"code": 200,
+"_postman_previewlanguage": "json",
+"body": "{\n    "name": "Kerala Backwaters",\n    "location": "Kerala, India",\n    "eco_score": 95,\n    "description": "Sustainable houseboats and nature walks.",\n    "image_url": "kerala.jpg",\n    "id": "550e8400-e29b-41d4-a716-446655440000"\n}"
+}
+]
+},
+{
+"name": "5. Update Destination",
+"request": {
+"method": "PUT",
+"header": [
+{
+"key": "Content-Type",
+"value": "application/json"
+}
+],
+"body": {
+"mode": "raw",
+"raw": "{\n  "name": "Kerala Backwaters Updated",\n  "location": "Kerala, India",\n  "eco_score": 99,\n  "description": "Even more sustainable now!",\n  "image_url": "kerala2.jpg"\n}"
+},
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"response": [
+{
+"name": "Updated Example",
+"originalRequest": {
+"method": "PUT",
+"header": [
+{
+"key": "Content-Type",
+"value": "application/json"
+}
+],
+"body": {
+"mode": "raw",
+"raw": "{\n  "name": "Kerala Backwaters Updated",\n  "location": "Kerala, India",\n  "eco_score": 99,\n  "description": "Even more sustainable now!",\n  "image_url": "kerala2.jpg"\n}"
+},
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"status": "OK",
+"code": 200,
+"_postman_previewlanguage": "json",
+"body": "{\n    "name": "Kerala Backwaters Updated",\n    "location": "Kerala, India",\n    "eco_score": 99,\n    "description": "Even more sustainable now!",\n    "image_url": "kerala2.jpg",\n    "id": "550e8400-e29b-41d4-a716-446655440000"\n}"
+}
+]
+},
+{
+"name": "6. Delete Destination",
+"request": {
+"method": "DELETE",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"response": [
+{
+"name": "Deleted Example",
+"originalRequest": {
+"method": "DELETE",
+"url": {
+"raw": "http://127.0.0.1:8000/api/destinations/550e8400-e29b-41d4-a716-446655440000",
+"protocol": "http",
+"host": ["127", "0", "0", "1"],
+"port": "8000",
+"path": ["api", "destinations", "550e8400-e29b-41d4-a716-446655440000"]
+}
+},
+"status": "No Content",
+"code": 204,
+"_postman_previewlanguage": "text",
+"body": ""
+}
+]
+}
+]
+}

@@ -1,28 +1,48 @@
-from fastapi import FastAPI, HTTPException, status, Query
+from fastapi import FastAPI, HTTPException, status, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uuid
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import Session
+from database import Base, engine, get_db
 
-# Initialize FastAPI App
-app = FastAPI(
-    title="Eco Voyage AI API",
-    description="Backend API for Eco Voyage AI Travel Recommendations",
-    version="1.0.0"
-)
+# --- 1. SQLALCHEMY DATABASE MODEL ---
+# This defines how the table is structured in your Supabase PostgreSQL database
+class DestinationDB(Base):
+    __tablename__ = "destinations"
 
-# Configure CORS (Cross-Origin Resource Sharing)
-# This allows your Next.js frontend (port 3000) to communicate with this FastAPI backend
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String, index=True)
+    location = Column(String)
+    eco_score = Column(Integer)
+    description = Column(String)
+    image_url = Column(String)
+
+class UserDB(Base):
+    __tablename__ = "users"
+    
+    id = Column(String, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String, unique=True, index=True)
+    password = Column(String) # In a production app, we would hash this!
+
+# Create all tables in the database automatically if they don't exist
+Base.metadata.create_all(bind=engine)
+
+# --- 2. FASTAPI APP INITIALIZATION ---
+app = FastAPI(title="Eco Voyage AI API", version="2.0.0")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"], # Allow requests from your Next.js app
+    allow_origins=["*"], 
     allow_credentials=True,
-    allow_methods=["*"], # Allow all HTTP methods (GET, POST, PUT, DELETE)
-    allow_headers=["*"], # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# --- DATA MODELS ---
-# Using Pydantic to validate incoming and outgoing data
+# --- 3. PYDANTIC SCHEMAS (Data Validation) ---
+# This ensures that incoming API data is correctly formatted
 class DestinationBase(BaseModel):
     name: str
     location: str
@@ -35,76 +55,96 @@ class DestinationCreate(DestinationBase):
 
 class Destination(DestinationBase):
     id: str
+    class Config:
+        from_attributes = True
 
-# --- IN-MEMORY DATABASE ---
-# For Week 4, we use a simple list. We will replace this with PostgreSQL in Week 5.
-destinations_db: List[Destination] = [
-    Destination(
-        id=str(uuid.uuid4()),
-        name="Kerala Backwaters",
-        location="Kerala, India",
-        eco_score=95,
-        description="Sustainable houseboats and nature walks.",
-        image_url="kerala.jpg"
-    ),
-    Destination(
-        id=str(uuid.uuid4()),
-        name="Spiti Valley",
-        location="Himachal Pradesh, India",
-        eco_score=90,
-        description="Eco-friendly homestays in the high Himalayas.",
-        image_url="spiti.jpg"
-    )
-]
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    password: str
 
-# --- REST API ENDPOINTS ---
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
-# 1. GET List: Retrieve all destinations
-@app.get("/api/destinations", response_model=List[Destination], status_code=status.HTTP_200_OK)
-async def get_all_destinations():
-    return destinations_db
+# --- 4. REST API ENDPOINTS (Connected to PostgreSQL) ---
 
-# 2. GET Search: Search destinations by name or location (Must be before /{id} to avoid path conflict)
-@app.get("/api/destinations/search", response_model=List[Destination], status_code=status.HTTP_200_OK)
-async def search_destinations(q: str = Query(..., description="Search query for name or location")):
-    results = [
-        dest for dest in destinations_db 
-        if q.lower() in dest.name.lower() or q.lower() in dest.location.lower()
-    ]
+@app.get("/api/destinations", response_model=List[Destination])
+async def get_all_destinations(db: Session = Depends(get_db)):
+    return db.query(DestinationDB).all()
+
+@app.get("/api/destinations/search", response_model=List[Destination])
+async def search_destinations(q: str, db: Session = Depends(get_db)):
+    results = db.query(DestinationDB).filter(
+        (DestinationDB.name.ilike(f"%{q}%")) | (DestinationDB.location.ilike(f"%{q}%"))
+    ).all()
     if not results:
-        raise HTTPException(status_code=404, detail="No destinations found matching your search.")
+        raise HTTPException(status_code=404, detail="No destinations found.")
     return results
 
-# 3. GET Single: Retrieve a specific destination by ID
-@app.get("/api/destinations/{dest_id}", response_model=Destination, status_code=status.HTTP_200_OK)
-async def get_destination(dest_id: str):
-    for dest in destinations_db:
-        if dest.id == dest_id:
-            return dest
-    raise HTTPException(status_code=404, detail="Destination not found")
+@app.get("/api/destinations/{dest_id}", response_model=Destination)
+async def get_destination(dest_id: str, db: Session = Depends(get_db)):
+    dest = db.query(DestinationDB).filter(DestinationDB.id == dest_id).first()
+    if not dest:
+        raise HTTPException(status_code=404, detail="Destination not found")
+    return dest
 
-# 4. POST Create: Add a new eco-destination
 @app.post("/api/destinations", response_model=Destination, status_code=status.HTTP_201_CREATED)
-async def create_destination(dest_in: DestinationCreate):
-    new_dest = Destination(id=str(uuid.uuid4()), **dest_in.dict())
-    destinations_db.append(new_dest)
+async def create_destination(dest_in: DestinationCreate, db: Session = Depends(get_db)):
+    new_dest = DestinationDB(id=str(uuid.uuid4()), **dest_in.model_dump())
+    db.add(new_dest)
+    db.commit()
+    db.refresh(new_dest)
     return new_dest
 
-# 5. PUT Update: Modify an existing destination
-@app.put("/api/destinations/{dest_id}", response_model=Destination, status_code=status.HTTP_200_OK)
-async def update_destination(dest_id: str, dest_update: DestinationCreate):
-    for index, dest in enumerate(destinations_db):
-        if dest.id == dest_id:
-            updated_dest = Destination(id=dest_id, **dest_update.dict())
-            destinations_db[index] = updated_dest
-            return updated_dest
-    raise HTTPException(status_code=404, detail="Destination not found")
+@app.put("/api/destinations/{dest_id}", response_model=Destination)
+async def update_destination(dest_id: str, dest_update: DestinationCreate, db: Session = Depends(get_db)):
+    db_dest = db.query(DestinationDB).filter(DestinationDB.id == dest_id).first()
+    if not db_dest:
+        raise HTTPException(status_code=404, detail="Destination not found")
+    
+    for key, value in dest_update.model_dump().items():
+        setattr(db_dest, key, value)
+        
+    db.commit()
+    db.refresh(db_dest)
+    return db_dest
 
-# 6. DELETE: Remove a destination
 @app.delete("/api/destinations/{dest_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_destination(dest_id: str):
-    for index, dest in enumerate(destinations_db):
-        if dest.id == dest_id:
-            destinations_db.pop(index)
-            return
-    raise HTTPException(status_code=404, detail="Destination not found")
+async def delete_destination(dest_id: str, db: Session = Depends(get_db)):
+    db_dest = db.query(DestinationDB).filter(DestinationDB.id == dest_id).first()
+    if not db_dest:
+        raise HTTPException(status_code=404, detail="Destination not found")
+    
+    db.delete(db_dest)
+    db.commit()
+    return None
+
+@app.post("/api/auth/register")
+async def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Check if email already exists
+    existing_user = db.query(UserDB).filter(UserDB.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered. Please sign in.")
+    
+    # Create new user in database
+    new_user = UserDB(id=str(uuid.uuid4()), name=user.name, email=user.email, password=user.password)
+    db.add(new_user)
+    db.commit()
+    return {"message": "User created successfully"}
+
+@app.post("/api/auth/login")
+async def login_user(user: UserLogin, db: Session = Depends(get_db)):
+    # Find user by email
+    db_user = db.query(UserDB).filter(UserDB.email == user.email).first()
+    
+    # 1. No account found
+    if not db_user:
+        raise HTTPException(status_code=404, detail="No account found. Please create an account first.")
+    
+    # 2. Incorrect password
+    if db_user.password != user.password:
+        raise HTTPException(status_code=401, detail="Incorrect password. Try again.")
+    
+    # 3. Success
+    return {"message": "Login successful", "name": db_user.name}
