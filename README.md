@@ -169,6 +169,21 @@ https://github.com/AkshatTrip2405/eco-voyage-ai
 
 ---
 
+## Database Setup
+
+**Database Choice & Why:**
+For this project, I chose **PostgreSQL** (hosted on Supabase) as the database. I selected it because a relational database perfectly fits the structured nature of our destination and user data. It also integrates seamlessly with our Python/FastAPI backend using SQLAlchemy.
+
+**Schema Diagram:**
+The database schema includes tables for Users, Destinations, and Reviews. *(See the `W5_SchemaDiagram_26100440.pdf` file included in the submission for the full visual diagram).*
+
+**How to Set Up the Database:**
+1. Clone this repository to your local machine.
+2. Navigate to the `backend` folder.
+3. Create a `.env` file based on the provided `.env.example` file.
+4. Add your live PostgreSQL connection string to the `DATABASE_URL` variable in the `.env` file.
+5. Run the FastAPI server, and the tables will be created automatically.
+
 ## Author
 
 Akshat Tripathi  
