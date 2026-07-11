@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, status, Query, Depends
+import os
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException, status, Query, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -7,8 +9,15 @@ from sqlalchemy import Column, String, Integer
 from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 
+# --- WEEK 6: SECURITY IMPORTS ---
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials # NEW IMPORTS
+
 # --- 1. SQLALCHEMY DATABASE MODEL ---
-# This defines how the table is structured in your Supabase PostgreSQL database
 class DestinationDB(Base):
     __tablename__ = "destinations"
 
@@ -25,13 +34,49 @@ class UserDB(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String)
     email = Column(String, unique=True, index=True)
-    password = Column(String) # In a production app, we would hash this!
+    password = Column(String) 
 
-# Create all tables in the database automatically if they don't exist
 Base.metadata.create_all(bind=engine)
 
+# --- WEEK 6: SECURITY CONFIGURATION ---
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+JWT_SECRET = os.getenv("JWT_SECRET", "super-secret-eco-voyage-key-2026")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 
+limiter = Limiter(key_func=get_remote_address)
+security = HTTPBearer() # NEW: Extracts the Bearer token from the header
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=ALGORITHM)
+    return encoded_jwt
+
+# NEW: Security Dependency to protect routes
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing token. You must be logged in.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
 # --- 2. FASTAPI APP INITIALIZATION ---
-app = FastAPI(title="Eco Voyage AI API", version="2.0.0")
+app = FastAPI(title="Eco Voyage AI API - Secured", version="3.0.0")
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,8 +86,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- 3. PYDANTIC SCHEMAS (Data Validation) ---
-# This ensures that incoming API data is correctly formatted
+# --- 3. PYDANTIC SCHEMAS ---
 class DestinationBase(BaseModel):
     name: str
     location: str
@@ -67,10 +111,11 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
-# --- 4. REST API ENDPOINTS (Connected to PostgreSQL) ---
+# --- 4. REST API ENDPOINTS ---
 
+# UPDATED: Added Depends(verify_token) to protect this route!
 @app.get("/api/destinations", response_model=List[Destination])
-async def get_all_destinations(db: Session = Depends(get_db)):
+async def get_all_destinations(db: Session = Depends(get_db), current_user: dict = Depends(verify_token)):
     return db.query(DestinationDB).all()
 
 @app.get("/api/destinations/search", response_model=List[Destination])
@@ -89,8 +134,9 @@ async def get_destination(dest_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Destination not found")
     return dest
 
+# UPDATED: Protected this route too!
 @app.post("/api/destinations", response_model=Destination, status_code=status.HTTP_201_CREATED)
-async def create_destination(dest_in: DestinationCreate, db: Session = Depends(get_db)):
+async def create_destination(dest_in: DestinationCreate, db: Session = Depends(get_db), current_user: dict = Depends(verify_token)):
     new_dest = DestinationDB(id=str(uuid.uuid4()), **dest_in.model_dump())
     db.add(new_dest)
     db.commit()
@@ -120,31 +166,39 @@ async def delete_destination(dest_id: str, db: Session = Depends(get_db)):
     db.commit()
     return None
 
+# --- WEEK 6: SECURE AUTH ENDPOINTS ---
+
 @app.post("/api/auth/register")
-async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if email already exists
+@limiter.limit("5/minute")
+async def register_user(request: Request, user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(UserDB).filter(UserDB.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered. Please sign in.")
     
-    # Create new user in database
-    new_user = UserDB(id=str(uuid.uuid4()), name=user.name, email=user.email, password=user.password)
+    hashed_password = get_password_hash(user.password)
+    
+    new_user = UserDB(id=str(uuid.uuid4()), name=user.name, email=user.email, password=hashed_password)
     db.add(new_user)
     db.commit()
+    
     return {"message": "User created successfully"}
 
 @app.post("/api/auth/login")
-async def login_user(user: UserLogin, db: Session = Depends(get_db)):
-    # Find user by email
+@limiter.limit("5/minute")
+async def login_user(request: Request, user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(UserDB).filter(UserDB.email == user.email).first()
     
-    # 1. No account found
     if not db_user:
         raise HTTPException(status_code=404, detail="No account found. Please create an account first.")
     
-    # 2. Incorrect password
-    if db_user.password != user.password:
+    if not verify_password(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Incorrect password. Try again.")
     
-    # 3. Success
-    return {"message": "Login successful", "name": db_user.name}
+    access_token = create_access_token(data={"sub": db_user.email, "name": db_user.name})
+    
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "message": "Login successful", 
+        "name": db_user.name
+    }

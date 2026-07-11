@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 // Define the shape of our data coming from the Python Backend
 interface Destination {
@@ -16,6 +17,8 @@ interface Destination {
 const DEFAULT_BG = "https://images.unsplash.com/photo-1500530855697-b586d89ba562?auto=format&fit=crop&w=1920&q=80";
 
 export default function DashboardPage() {
+  const router = useRouter();
+
   // States
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +29,14 @@ export default function DashboardPage() {
   
   // NEW STATE: Tracks which destination's itinerary is currently open
   const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
+
+  // Security: Guard the route - Kick out unauthenticated users!
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   // Helper to get real high-res images
   const getHighResImage = (name: string, url: string) => {
@@ -46,11 +57,19 @@ export default function DashboardPage() {
     ...destinations.map(d => getHighResImage(d.name, d.image_url))
   ]));
 
-  // Fetching data from the FastAPI Backend
+  // Fetching data from the FastAPI Backend (NOW WITH TOKEN!)
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/destinations");
+        const token = localStorage.getItem("access_token");
+        
+        const response = await fetch("http://127.0.0.1:8000/api/destinations", {
+          headers: {
+            // This is the secret handshake! Passing the JWT token to the backend.
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const data = await response.json();
@@ -62,7 +81,11 @@ export default function DashboardPage() {
         setIsLoading(false);
       }
     };
-    fetchDestinations();
+    
+    // Only fetch if we have a token (prevents flash errors on redirect)
+    if (localStorage.getItem("access_token")) {
+      fetchDestinations();
+    }
   }, []);
 
   return (
@@ -85,13 +108,34 @@ export default function DashboardPage() {
       {/* Main Content */}
       <div className="relative z-10 p-6 md:p-10 max-w-7xl mx-auto h-screen overflow-y-auto pb-32">
         
-        <header className="mb-10 text-white drop-shadow-lg">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-            Welcome User! <span className="inline-block animate-wave">👋</span>
-          </h1>
-          <p className="mt-3 text-gray-200 text-lg font-medium max-w-2xl">
-            Discover sustainable stays and eco-friendly adventures seamlessly tailored to your carbon footprint.
-          </p>
+        <header className="mb-10 text-white drop-shadow-lg flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+              Welcome User! <span className="inline-block animate-wave">👋</span>
+            </h1>
+            <p className="mt-3 text-gray-200 text-lg font-medium max-w-2xl">
+              Discover sustainable stays and eco-friendly adventures seamlessly tailored to your carbon footprint.
+            </p>
+          </div>
+          
+          {/* Top Right Navigation */}
+          <div className="flex gap-4">
+            <button 
+              onClick={() => router.push("/profile")}
+              className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-6 py-2.5 rounded-xl font-bold transition-all backdrop-blur-md"
+            >
+              My Profile
+            </button>
+            <button 
+              onClick={() => {
+                localStorage.removeItem("access_token");
+                router.push("/login");
+              }}
+              className="bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 text-white px-6 py-2.5 rounded-xl font-bold transition-all backdrop-blur-md"
+            >
+              Logout
+            </button>
+          </div>
         </header>
 
         {/* Stats Overview */}
